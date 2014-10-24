@@ -18,11 +18,31 @@ namespace Neo4j
             var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
 
             client.Connect();
-            //removeActor(client);
-            createActor(client);
-            updateActor(client);
+            actor ac = new actor();
+            ac.name = "Panda stick";
+            ac.id = 4646464;
+            ac.imageUrl = "http://www.pandaworkthis.bear";
+            ac.lastModified = 342545246;
+            ac.version = 1;
+
+            
+
+            movie mc = new movie();
+            mc.title = "Knife after dark2";
+            mc.runtime = 200;
+            mc.lastModified = 3243;
+            mc.tagLine = "Scary";
+
+            //createNode(client, ac,"Actor");
+            //createNode(client, mc,"Movie");
             actorInfo(client);
             MovieInfo(client);
+            
+            //removeActor(client);
+            //createActor(client);
+            //updateActor(client);
+            //actorInfo(client);
+            //MovieInfo(client);
 
             Console.ReadKey();
         }
@@ -31,10 +51,10 @@ namespace Neo4j
         {
             var result =
                 client.Cypher
-                .Match("(n {name:'Olson Yarzagaray'})")
-                .Return(n => n.As<actor>())
+                .Match("(n {name:'Panda stick'})")
+                .Return(n => n.As<director>())
                 .Results;
-            foreach (actor a in result)
+            foreach (director a in result)
             {
                 Console.WriteLine(a.name + " " + a.id);
             }
@@ -43,7 +63,7 @@ namespace Neo4j
         }
         public static void MovieInfo(GraphClient client)
         {
-            var title = "Independence Day";
+            var title = "Knife after dark2";
             var result =
                 client.Cypher
                 .Match("(n {title:'"+title+"'})")
@@ -58,10 +78,38 @@ namespace Neo4j
         }
         public static void createActor(GraphClient client)
         {
-            var actor = client.Create(new actor() { 
+            var actor = client.Create(new director() { 
                 name = "Geddy Schellevis", 
                 id = 50500505 });
         }
+        
+        // This is a generic function that creates all the node necessary for this assignment
+        public static void createNode(GraphClient client, Object newNode, String typeOfNode)
+        {
+            String nodeType;
+            
+            switch (typeOfNode)
+            {
+                case "Actor":
+                    nodeType = "n:Actor";
+                    break;
+                case "Movie":
+                    nodeType = "n:Movie";
+                    break;
+                case "Director":
+                    nodeType = "n:Director";
+                    break;
+                default:
+                    nodeType = "n";
+                    break;
+
+            }
+            client.Cypher
+                .Create("(" + nodeType + "{newNode})")
+                .WithParam("newNode", newNode)
+                .ExecuteWithoutResults();
+        }
+
         public static void removeActor(GraphClient client)
         {
             client.Cypher
@@ -97,6 +145,18 @@ namespace Neo4j
         public int version { get; set; }
         public string homepage { get; set; }
         public int runtime { get; set; }
+    }
+
+    class director
+    {
+        public string type { get; set; }
+        public string name { get; set; }
+        public int id { get; set; }
+        public long lastModified { get; set; }
+        public int version { get; set; }
+        public string imageUrl { get; set; }
+        public string biography { get; set; }
+
     }
 
     class actor
