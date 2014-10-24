@@ -10,8 +10,7 @@ namespace Neo4j
 
     class Program
     {
-        //test commit
-        // fuck you
+        
         static void Main(string[] args)
         {
             //Connect to the graph database
