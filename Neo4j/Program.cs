@@ -13,7 +13,7 @@ namespace Neo4j
         
         static void Main(string[] args)
         {
-            //Branch geddy
+            //Branch fuck you
             //Connect to the graph database
             var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
 
