@@ -53,7 +53,6 @@ namespace Neo4j
                 Console.WriteLine(m.title + " " + m.runtime);
                 Console.WriteLine(m.description);
 
-
             }
         }
         public static void createActor(GraphClient client)
