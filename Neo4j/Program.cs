@@ -18,26 +18,31 @@ namespace Neo4j
             var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
 
             client.Connect();
-            actor ac = new actor();
+            //My test actor
+            Actor ac = new Actor();
             ac.name = "Panda stick";
             ac.id = 4646464;
             ac.imageUrl = "http://www.pandaworkthis.bear";
             ac.lastModified = 342545246;
             ac.version = 1;
+            //ac.biography = "This is mr Panda WITHOUT any update done to it";
+            //ac.biography = "This is mr Panda WITH update done to it, YEAH BABY";
 
-            
+            updateActor(client, ac);
 
-            movie mc = new movie();
+            // My Test movie
+            Movie mc = new Movie();
             mc.title = "Knife after dark2";
             mc.runtime = 200;
             mc.lastModified = 3243;
             mc.tagLine = "Scary";
 
             //createNode(client, ac,"Actor");
-            //createNode(client, mc,"Movie");
-            actorInfo(client);
-            MovieInfo(client);
             
+            //createNode(client, mc,"Movie");
+            //actorInfo(client);
+            //MovieInfo(client);
+            //removeNode(client, ac);
             //removeActor(client);
             //createActor(client);
             //updateActor(client);
@@ -52,9 +57,9 @@ namespace Neo4j
             var result =
                 client.Cypher
                 .Match("(n {name:'Panda stick'})")
-                .Return(n => n.As<director>())
+                .Return(n => n.As<Director>())
                 .Results;
-            foreach (director a in result)
+            foreach (Director a in result)
             {
                 Console.WriteLine(a.name + " " + a.id);
             }
@@ -67,22 +72,16 @@ namespace Neo4j
             var result =
                 client.Cypher
                 .Match("(n {title:'"+title+"'})")
-                .Return(n => n.As<movie>())
+                .Return(n => n.As<Movie>())
                 .Results;
-            foreach (movie m in result)
+            foreach (Movie m in result)
             {
                 Console.WriteLine(m.title + " " + m.runtime);
                 Console.WriteLine(m.description);
 
             }
         }
-        public static void createActor(GraphClient client)
-        {
-            var actor = client.Create(new director() { 
-                name = "Geddy Schellevis", 
-                id = 50500505 });
-        }
-        
+        // CRUD operations for NEO4J
         // This is a generic function that creates all the node necessary for this assignment
         public static void createNode(GraphClient client, Object newNode, String typeOfNode)
         {
@@ -110,24 +109,69 @@ namespace Neo4j
                 .ExecuteWithoutResults();
         }
 
-        public static void removeActor(GraphClient client)
+        // The following methods deletes the nodes in neo4j
+        public static void removeActor(GraphClient client, Actor acteur)
         {
             client.Cypher
-            .Match("(n {name:'Geddy Schellevis'})")
-            .Delete("n")
+            .Match("(a:Actor)")
+            .Where((Actor a) => a.name == acteur.name)
+            .Delete("a")
             .ExecuteWithoutResults();
         }
-        public static void updateActor(GraphClient client)
+
+        public static void removeDirector(GraphClient client, Director dir)
         {
             client.Cypher
-                .Match("(n {name:'Geddy Schellevis'})")
-                .Set("n.name={name}")
-                .WithParam("name", "Olson Yarzagaray")
+            .Match("(d:Director)")
+            .Where((Director d) => d.name == dir.name)
+            .Delete("d")
+            .ExecuteWithoutResults();
+        }
+
+        public static void removeMovie(GraphClient client, Movie mov)
+        {
+            client.Cypher
+            .Match("(m:Movie)")
+            .Where((Movie m) => m.title == mov.title)
+            .Delete("m")
+            .ExecuteWithoutResults();
+        }
+
+        //The following methods updates the nodes in neo4j
+        public static void updateActor(GraphClient client, Actor acteur)
+        {
+            client.Cypher
+                .Match("(a:Actor)")
+                .Where((Actor a) => a.name == acteur.name)
+                .Set("a = {updateActeur}")
+                .WithParam("updateActeur", acteur)
                 .ExecuteWithoutResults();
         }
 
+        public static void updateDirector(GraphClient client, Director dir)
+        {
+            client.Cypher
+                .Match("(d:Director)")
+                .Where((Director d) => d.name == dir.name)
+                .Set("d = {updateDir}")
+                .WithParam("updateDir", dir)
+                .ExecuteWithoutResults();
+        }
+
+        public static void updateMovie(GraphClient client, Movie mov)
+        {
+            client.Cypher
+                .Match("(m:Movie)")
+                .Where((Movie m) => m.title == mov.title)
+                .Set("m = {updateMov}")
+                .WithParam("updateMov", mov)
+                .ExecuteWithoutResults();
+        }
+
+
     }
-    class movie
+    // The class Movie, Director and Actor represents the nodes in the neo4j database
+    class Movie
     {
         public string type { get; set; }
         public string description { get; set; }
@@ -147,7 +191,7 @@ namespace Neo4j
         public int runtime { get; set; }
     }
 
-    class director
+    class Director
     {
         public string type { get; set; }
         public string name { get; set; }
@@ -159,7 +203,7 @@ namespace Neo4j
 
     }
 
-    class actor
+    class Actor
     {
         public string type { get;set;}
         public string name {get;set;}
