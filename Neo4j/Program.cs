@@ -17,6 +17,8 @@ namespace Neo4j
             List<Movie> movieTestList = new List<Movie>();
             List<Actor> actorTestList1 = new List<Actor>();
             List<Actor> actorTestList2 = new List<Actor>();
+            List<Actor> actorTestList3 = new List<Actor>();
+            List<long> movieCountTestList1 = new List<long>();
             List<Director> directorTestList = new List<Director>();
 
             //Branch Olson
@@ -55,12 +57,33 @@ namespace Neo4j
             //updateActor(client);
             //actorInfo(client, ac, actorTestList);
             //movieInfo(client, mc, movieTestList);
-
+            /*
             actorsWhoPlayedMoreThanTwoFilms(client,ac,actorTestList1, actorTestList2);
 
             foreach(Actor a in actorTestList2)
             {
                 Console.WriteLine("This is the nodes that you get" + a.name + " " + a.imageUrl);
+            }
+
+            Console.WriteLine("   ");
+            Actor ac2 = new Actor();
+            ac2.name = "Kevin Smith";
+
+            actorWhoDirectedOwnMovie(client, actorTestList3,movieCountTestList1);
+
+
+            int index = 0;
+            foreach(Actor act in actorTestList3)
+            {
+                Console.WriteLine("This actor " + act.name + " and Count: " + movieCountTestList1[index]);
+                index++;
+            }*/
+
+            mostRecentMovies(client, movieTestList);
+
+            foreach(Movie mov in movieTestList)
+            {
+                Console.WriteLine("Movie Title " + mov.title + " Movie Release Date: " + mov.longToDate());
             }
 
             Console.ReadKey();
@@ -111,6 +134,14 @@ namespace Neo4j
                 movList.Add(m);
             }
         }
+
+        public DateTime longToDate(long releaseDate)
+        {
+            DateTime start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            DateTime date = start.AddMilliseconds(releaseDate).ToLocalTime();
+            return date;
+        }
+
         // CRUD operations for NEO4J
         // This is a generic function that creates all the node necessary for this assignment
         public static void createNode(GraphClient client, Object newNode, String typeOfNode)
@@ -198,16 +229,6 @@ namespace Neo4j
                 .ExecuteWithoutResults();
         }
 
-
-
-            /* Welke acteurs hebben meer dan 2 keer met elkaar gespeeld?
-
-        MATCH (a:Actor)-[:ACTS_IN]-(x)-[:ACTS_IN]-(ac:Actor)
-        WHERE a.name = "Keanu Reeves" AND NOT ac.name = "Keanu Reeves "
-        RETURN a, ac, COUNT(x) > 2
-        ORDER BY COUNT(x) DESC
-        LIMIT 3; */
-
         public static void actorsWhoPlayedMoreThanTwoFilms(GraphClient client, Actor ac, List<Actor> listActor1, List<Actor> listActor2)
         {
             var result = client.Cypher
@@ -230,6 +251,72 @@ namespace Neo4j
                 listActor2.Add(a.listActor2);
             }
         }
+
+        /*
+         * MATCH (a:Actor)-[:ACTS_IN]-(m)-[:DIRECTED]-(d:Director)
+            WHERE a.name = 'Kevin Smith' AND d.name = a.name
+            RETURN a,m; */
+
+        public static void actorWhoDirectedOwnMovie(GraphClient client, List<Actor> listActor,List<long> listCount)
+        {
+            var result = client.Cypher
+                .Match("(a:Actor)-[:ACTS_IN]-(m)-[r:DIRECTED]-(d:Director)")
+                .Where((Actor a, Director d) => a.name == d.name)
+                .Return((a, r) => new { listActor = a.As<Actor>(), numberOfMovies = r.Count()})
+                .OrderBy("numberOfMovies DESC")
+                .Limit(15)
+                .Results;
+
+            foreach (var a in result)
+            {
+                listActor.Add(a.listActor);
+            }
+
+            foreach (var a in result)
+            {
+                listCount.Add(a.numberOfMovies);
+            }
+        }
+
+        public static void mostRecentMovies(GraphClient client, List<Movie> listMovie)
+        {
+            var result = client.Cypher
+                .Match("(m:Movie)")
+                .Return((m) => new
+                {
+                    listMovie = m.As<Movie>(),
+                })
+                .OrderBy("m.ReleaseDate DESC")
+                .Limit(10)
+                .Results;
+
+            foreach (var a in result)
+            {
+                listMovie.Add(a.listMovie);
+            }
+
+        }
+
+        public static void mostRecentMoviesByGenre(GraphClient client,Movie movie, List<Movie> listMovie)
+        {
+            var result = client.Cypher
+                .Match("(m:Movie)")
+                .Where((Movie m) => m.genre == movie.genre)
+                .Return((m) => new
+                {
+                    listMovie = m.As<Movie>(),
+                })
+                .OrderBy("m.ReleaseDate DESC")
+                .Limit(10)
+                .Results;
+
+            foreach (var a in result)
+            {
+                listMovie.Add(a.listMovie);
+            }
+
+        }
+
     }
 
     // The class Movie, Director and Actor represents the nodes in the neo4j database
@@ -251,6 +338,14 @@ namespace Neo4j
         public int version { get; set; }
         public string homepage { get; set; }
         public int runtime { get; set; }
+
+        public DateTime longToDate()
+        {
+            DateTime start = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            DateTime date = start.AddMilliseconds(this.releaseDate).ToLocalTime();
+            return date;
+        }
+
     }
 
     class Director
