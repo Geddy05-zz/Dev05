@@ -13,6 +13,12 @@ namespace Neo4j
         
         static void Main(string[] args)
         {
+
+            List<Movie> movieTestList = new List<Movie>();
+            List<Actor> actorTestList1 = new List<Actor>();
+            List<Actor> actorTestList2 = new List<Actor>();
+            List<Director> directorTestList = new List<Director>();
+
             //Branch Olson
             //Connect to the graph database
             var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
@@ -20,15 +26,16 @@ namespace Neo4j
             client.Connect();
             //My test actor
             Actor ac = new Actor();
-            ac.name = "Panda stick";
+            ac.name = "Keanu Reeves";
+            /*
             ac.id = 4646464;
             ac.imageUrl = "http://www.pandaworkthis.bear";
             ac.lastModified = 342545246;
-            ac.version = 1;
+            ac.version = 1; */
             //ac.biography = "This is mr Panda WITHOUT any update done to it";
             //ac.biography = "This is mr Panda WITH update done to it, YEAH BABY";
 
-            updateActor(client, ac);
+            //updateActor(client, ac);
 
             // My Test movie
             Movie mc = new Movie();
@@ -46,39 +53,62 @@ namespace Neo4j
             //removeActor(client);
             //createActor(client);
             //updateActor(client);
-            //actorInfo(client);
-            //MovieInfo(client);
+            //actorInfo(client, ac, actorTestList);
+            //movieInfo(client, mc, movieTestList);
+
+            actorsWhoPlayedMoreThanTwoFilms(client,ac,actorTestList1, actorTestList2);
+
+            foreach(Actor a in actorTestList2)
+            {
+                Console.WriteLine("This is the nodes that you get" + a.name + " " + a.imageUrl);
+            }
 
             Console.ReadKey();
         }
 
-        public static void actorInfo(GraphClient client)
+        public static void actorInfo(GraphClient client, Actor act, List<Actor> actList)
         {
             var result =
                 client.Cypher
-                .Match("(n {name:'Panda stick'})")
-                .Return(n => n.As<Director>())
+                .Match("(a:Actor)")
+                .Where((Actor a) => a.name == act.name)
+                .Return(a => a.As<Actor>())
                 .Results;
-            foreach (Director a in result)
+            foreach (Actor a in result)
             {
-                Console.WriteLine(a.name + " " + a.id);
+                actList.Add(a);
             }
 
 
         }
-        public static void MovieInfo(GraphClient client)
+
+        public static void directorInfo(GraphClient client, Director dir,List<Director> dirList)
         {
-            var title = "Knife after dark2";
             var result =
                 client.Cypher
-                .Match("(n {title:'"+title+"'})")
-                .Return(n => n.As<Movie>())
+                .Match("(d:Director)")
+                .Where((Director d) => d.name == dir.name)
+                .Return(d => d.As<Director>())
+                .Results;
+            foreach (Director d in result)
+            {
+                dirList.Add(d);
+            }
+
+
+        }
+
+        public static void movieInfo(GraphClient client, Movie mov, List<Movie> movList)
+        {
+            var result =
+                client.Cypher
+                .Match("(m:Movie)")
+                .Where((Movie m) => m.title == mov.title)
+                .Return(m => m.As<Movie>())
                 .Results;
             foreach (Movie m in result)
             {
-                Console.WriteLine(m.title + " " + m.runtime);
-                Console.WriteLine(m.description);
-
+                movList.Add(m);
             }
         }
         // CRUD operations for NEO4J
@@ -169,7 +199,39 @@ namespace Neo4j
         }
 
 
+
+            /* Welke acteurs hebben meer dan 2 keer met elkaar gespeeld?
+
+        MATCH (a:Actor)-[:ACTS_IN]-(x)-[:ACTS_IN]-(ac:Actor)
+        WHERE a.name = "Keanu Reeves" AND NOT ac.name = "Keanu Reeves "
+        RETURN a, ac, COUNT(x) > 2
+        ORDER BY COUNT(x) DESC
+        LIMIT 3; */
+
+        public static void actorsWhoPlayedMoreThanTwoFilms(GraphClient client, Actor ac, List<Actor> listActor1, List<Actor> listActor2)
+        {
+            var result = client.Cypher
+                .Match("(a:Actor) -[:ACTS_IN]-(x)-[:ACTS_IN]-(act:Actor)")
+                .Where((Actor a) => a.name == ac.name)
+                .AndWhere((Actor act) => act.name != ac.name)
+                .Return((a, act, x) => new
+                {
+                    listActor1 = a.As<Actor>(),
+                    listActor2 = act.As<Actor>(),
+                    numberOfMovies = x.Count()
+                })
+                .OrderBy("numberOfMovies DESC")
+                .Limit(3)
+                .Results;
+
+            foreach(var a in result)
+            {
+                listActor1.Add(a.listActor1);
+                listActor2.Add(a.listActor2);
+            }
+        }
     }
+
     // The class Movie, Director and Actor represents the nodes in the neo4j database
     class Movie
     {
