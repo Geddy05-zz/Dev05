@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neo4jClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,13 +14,23 @@ namespace TestFormApplication
     public partial class Form3 : Form
     {
         TextBox textBox1;
+        TextBox textBoxName;
+        TextBox textBoxProfileImg;
+        TextBox textBoxDescription;
+        TextBox textBoxMovieTitle = new TextBox();
+        TextBox textBoxMovieImageUrl = new TextBox();
+        TextBox textBoxMovieGenre = new TextBox();
+        TextBox textBoxMovieRunTime = new TextBox();
+        TextBox textBoxMovieDescription = new TextBox();
         Panel panel1;
         Actor actor;
         Director director;
         Movie movie;
+        DataBaseHandler dbHandler;
         public Form3()
         {
             InitializeComponent();
+            dbHandler = new DataBaseHandler();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -43,23 +54,20 @@ namespace TestFormApplication
 
         private void button2_Click(object sender, EventArgs e)
         {
-            this.Dispose();
-            Form2 f2 = new Form2();
-            f2.ShowDialog();
-            this.Close();
+            disposeForm();
         }
 
         //example msdn
         public void CreateMyPanel()
         {
             panel1 = new Panel();
-            textBox1 = new TextBox();
-            TextBox textBox2 = new TextBox();
-            TextBox textBox3 = new TextBox();
-            TextBox textBox4 = new TextBox();
+            textBoxName = new TextBox();
+            textBoxProfileImg = new TextBox();
+            textBoxDescription = new TextBox();
+            
             Button button1 = new Button();
 
-            // make the proper class for the situation.
+            // make the proper class for the setup.
             string selected = this.comboBox1.GetItemText(this.comboBox1.SelectedItem);
             if(selected.Equals("Actor"))
             {
@@ -81,19 +89,19 @@ namespace TestFormApplication
             // Initialize the Label and TextBox controls.
             Size textBoxSize = new Size(215, 26);
 
-            textBox1.Location = new Point(65, 40);
-            textBox1.Text = "Name";
-            textBox1.Size = textBoxSize;
-            textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBox2.Location = new Point(65, 93);
-            textBox2.Text = "Profile Image Url";
-            textBox2.Size = textBoxSize;
-            textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBox3.Location = new Point(65, 151);
-            textBox3.Text = "Biography";
-            textBox3.Size = new Size(215, 107);
-            textBox3.Multiline = true;
-            textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxName.Location = new Point(65, 40);
+            textBoxName.Text = "Name";
+            textBoxName.Size = textBoxSize;
+            textBoxName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxProfileImg.Location = new Point(65, 93);
+            textBoxProfileImg.Text = "Profile Image Url";
+            textBoxProfileImg.Size = textBoxSize;
+            textBoxProfileImg.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxDescription.Location = new Point(65, 151);
+            textBoxDescription.Text = "Biography";
+            textBoxDescription.Size = new Size(215, 107);
+            textBoxDescription.Multiline = true;
+            textBoxDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
   
             button1.Location = new Point(124, 286);
             button1.Text = "Create Node";
@@ -102,20 +110,20 @@ namespace TestFormApplication
             // Add the Panel control to the form.
             this.Controls.Add(panel1);
             // Add the TextBox and Button controls to the Panel.
-            panel1.Controls.Add(textBox1);
-            panel1.Controls.Add(textBox2);
-            panel1.Controls.Add(textBox3);
+            panel1.Controls.Add(textBoxName);
+            panel1.Controls.Add(textBoxProfileImg);
+            panel1.Controls.Add(textBoxDescription);
             panel1.Controls.Add(button1);
         }
 
         public void CreateMyPanelMovie()
         {
             panel1 = new Panel();
-            textBox1 = new TextBox();
-            TextBox textBox2 = new TextBox();
-            TextBox textBox3 = new TextBox();
-            TextBox textBox4 = new TextBox();
-            TextBox textBox5 = new TextBox();
+            textBoxMovieTitle = new TextBox();
+            textBoxMovieImageUrl = new TextBox();
+            textBoxMovieGenre = new TextBox();
+            textBoxMovieRunTime = new TextBox();
+            textBoxMovieDescription = new TextBox();
             Button button1 = new Button();
 
             // Initialize the Panel control.
@@ -124,30 +132,33 @@ namespace TestFormApplication
             // Set the Borderstyle for the Panel to three-dimensional.
             panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
 
+            //Create the class appropiate for this setup.
+            movie = new Movie();
+
             // Initialize the Label and TextBox controls.
             Size textBoxSize = new Size(215, 26);
 
-            textBox1.Location = new Point(65, 20);
-            textBox1.Text = "Title";
-            textBox1.Size = textBoxSize;
-            textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBox2.Location = new Point(65, 65);
-            textBox2.Text = "Image Url";
-            textBox2.Size = textBoxSize;
-            textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBox3.Location = new Point(65, 113);
-            textBox3.Text = "Genre";
-            textBox3.Size = textBoxSize;
-            textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBox4.Location = new Point(65, 156);
-            textBox4.Text = "Runtime";
-            textBox4.Size = textBoxSize;
-            textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBox5.Location = new Point(65, 198);
-            textBox5.Text = "Discription";
-            textBox5.Size = new Size(215, 107);
-            textBox5.Multiline = true;
-            textBox5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieTitle.Location = new Point(65, 20);
+            textBoxMovieTitle.Text = "Title";
+            textBoxMovieTitle.Size = textBoxSize;
+            textBoxMovieTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieImageUrl.Location = new Point(65, 65);
+            textBoxMovieImageUrl.Text = "Image Url";
+            textBoxMovieImageUrl.Size = textBoxSize;
+            textBoxMovieImageUrl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieGenre.Location = new Point(65, 113);
+            textBoxMovieGenre.Text = "Genre";
+            textBoxMovieGenre.Size = textBoxSize;
+            textBoxMovieGenre.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieRunTime.Location = new Point(65, 156);
+            textBoxMovieRunTime.Text = "Runtime";
+            textBoxMovieRunTime.Size = textBoxSize;
+            textBoxMovieRunTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieDescription.Location = new Point(65, 198);
+            textBoxMovieDescription.Text = "Discription";
+            textBoxMovieDescription.Size = new Size(215, 107);
+            textBoxMovieDescription.Multiline = true;
+            textBoxMovieDescription.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
             button1.Location = new Point(124, 329);
             button1.Text = "Create Node";
@@ -156,18 +167,45 @@ namespace TestFormApplication
             // Add the Panel control to the form.
             this.Controls.Add(panel1);
             // Add the TextBox and Button controls to the Panel.
-            panel1.Controls.Add(textBox1);
-            panel1.Controls.Add(textBox2);
-            panel1.Controls.Add(textBox3);
-            panel1.Controls.Add(textBox4);
-            panel1.Controls.Add(textBox5);
+            panel1.Controls.Add(textBoxMovieTitle);
+            panel1.Controls.Add(textBoxMovieImageUrl);
+            panel1.Controls.Add(textBoxMovieGenre);
+            panel1.Controls.Add(textBoxMovieRunTime);
+            panel1.Controls.Add(textBoxMovieDescription);
             panel1.Controls.Add(button1);
         }
 
         void Onb2Click(object sender, EventArgs e)
         {
-            textBox1.Text = "New Button (b2) Was Clicked!!";
-            
+            string confirmationMessage = "Node has been created successfully";
+
+            if (actor != null)
+            {
+                actor.name = textBoxName.Text;
+                actor.imageUrl = textBoxProfileImg.Text;
+                actor.biography = textBoxDescription.Text;
+                dbHandler.createNode(actor, "Actor");
+
+            }
+            else if (director != null)
+            {
+                director.name = textBoxName.Text;
+                director.imageUrl = textBoxProfileImg.Text;
+                director.biography = textBoxDescription.Text;
+                dbHandler.createNode(director, "Director");
+            }
+            else if (movie != null)
+            {
+                movie.title = textBoxMovieTitle.Text;
+                movie.imageUrl = textBoxMovieImageUrl.Text;
+                movie.genre = textBoxMovieGenre.Text;
+                movie.runtime = Convert.ToInt32(textBoxMovieRunTime.Text);
+                movie.description = textBoxMovieDescription.Text;
+                dbHandler.createNode(movie, "Movie");
+            }
+            MessageBox.Show(confirmationMessage);
+            disposeForm();
+
         }
 
         private void Form3_Load(object sender, EventArgs e)
@@ -178,6 +216,14 @@ namespace TestFormApplication
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void disposeForm()
+        {
+            this.Dispose();
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+            this.Close();
         }
 
     }

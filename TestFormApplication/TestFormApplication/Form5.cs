@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neo4jClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,21 +15,29 @@ namespace TestFormApplication
     {
         Panel panel1;
         Panel panel2;
+        Actor actor;
+        Director director;
+        Movie movie;
         Button buttonUpdateActDir;
         Button buttonUpdateMov;
         TextBox textBoxName;
         TextBox textBoxProfileImage;
         TextBox textBoxDescription;
-        TextBox textBoxTitle;
-        TextBox textBoxImageUrl;
-        TextBox textBoxGenre;
-        TextBox textBoxRuntime;
+        TextBox textBoxMovieTitle;
+        TextBox textBoxMovieImageUrl;
+        TextBox textBoxMovieGenre;
+        TextBox textBoxMovieRuntime;
         TextBox textBoxMovieDescription;
+        List<Actor> actorList = new List<Actor>();
+        DataBaseHandler dbHandler;
+         
         
 
         public Form5()
         {
             InitializeComponent();
+            dbHandler = new DataBaseHandler();
+            
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -40,6 +49,11 @@ namespace TestFormApplication
                 {
                     panel2.Dispose();
                     panel2 = null;
+                }
+                else if (panel1 != null)
+                {
+                    panel1.Dispose();
+                    panel1 = null;
                 }
                 CreateActorDirectorPanel();
             }
@@ -96,6 +110,21 @@ namespace TestFormApplication
             buttonUpdateActDir.Text = "update node";
             buttonUpdateActDir.Size = new Size(88,23);
             buttonUpdateActDir.Visible = false;
+
+            // Create class according to appropiate Selection in Combobox
+            string selected = this.comboBox1.GetItemText(this.comboBox1.SelectedItem);
+            if (selected.Equals("Actor"))
+            {
+                actor = new Actor();
+                searchButton.Click += new EventHandler(onActorButtonClick);
+                buttonUpdateActDir.Click += new EventHandler(onActorUpdateButtonClick);
+            }
+            else if (selected.Equals("Director"))
+            {
+                director = new Director();
+                searchButton.Click += new EventHandler(onDirectorButtonClick);
+                buttonUpdateActDir.Click += new EventHandler(onDirectorUpdateButtonClick);
+            }
                 
 
             // Add the Panel control to the form.
@@ -111,10 +140,11 @@ namespace TestFormApplication
         {
             panel2 = new Panel();
             buttonUpdateMov = new Button();
-            textBoxTitle = new TextBox();
-            textBoxImageUrl = new TextBox();
-            textBoxGenre = new TextBox();
-            textBoxRuntime = new TextBox();
+            movie = new Movie();
+            textBoxMovieTitle = new TextBox();
+            textBoxMovieImageUrl = new TextBox();
+            textBoxMovieGenre = new TextBox();
+            textBoxMovieRuntime = new TextBox();
             textBoxMovieDescription = new TextBox();
 
             // Initialize the Panel control.
@@ -126,26 +156,26 @@ namespace TestFormApplication
             // Initialize the Label and TextBox controls.
             Size textBoxSize = new Size(178, 26);
 
-            textBoxTitle.Location = new Point(43, 22);
-            textBoxTitle.Text = "Title";
-            textBoxTitle.Size = textBoxSize;
-            textBoxTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBoxTitle.ReadOnly = true;
-            textBoxImageUrl.Location = new Point(43, 55);
-            textBoxImageUrl.Text = "Image Url";
-            textBoxImageUrl.Size = textBoxSize;
-            textBoxImageUrl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBoxImageUrl.ReadOnly = true;
-            textBoxGenre.Location = new Point(43, 90);
-            textBoxGenre.Text = "Genre";
-            textBoxGenre.Size = textBoxSize;
-            textBoxGenre.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBoxGenre.ReadOnly = true;
-            textBoxRuntime.Location = new Point(43, 125);
-            textBoxRuntime.Text = "Runtime";
-            textBoxRuntime.Size = textBoxSize;
-            textBoxRuntime.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            textBoxRuntime.ReadOnly = true;
+            textBoxMovieTitle.Location = new Point(43, 22);
+            textBoxMovieTitle.Text = "Title";
+            textBoxMovieTitle.Size = textBoxSize;
+            textBoxMovieTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieTitle.ReadOnly = true;
+            textBoxMovieImageUrl.Location = new Point(43, 55);
+            textBoxMovieImageUrl.Text = "Image Url";
+            textBoxMovieImageUrl.Size = textBoxSize;
+            textBoxMovieImageUrl.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieImageUrl.ReadOnly = true;
+            textBoxMovieGenre.Location = new Point(43, 90);
+            textBoxMovieGenre.Text = "Genre";
+            textBoxMovieGenre.Size = textBoxSize;
+            textBoxMovieGenre.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieGenre.ReadOnly = true;
+            textBoxMovieRuntime.Location = new Point(43, 125);
+            textBoxMovieRuntime.Text = "Runtime";
+            textBoxMovieRuntime.Size = textBoxSize;
+            textBoxMovieRuntime.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            textBoxMovieRuntime.ReadOnly = true;
             textBoxMovieDescription.Location = new Point(43, 175);
             textBoxMovieDescription.Text = "Description";
             textBoxMovieDescription.Size = new Size(178, 125);
@@ -157,13 +187,15 @@ namespace TestFormApplication
             buttonUpdateMov.Size = new Size(88, 23);
             buttonUpdateMov.Visible = false;
 
+            searchButton.Click += new EventHandler(onMovieButtonClick);
+
             // Add the Panel control to the form.
             this.Controls.Add(panel2);
             // Add the TextBox and Button controls to the Panel.
-            panel2.Controls.Add(textBoxTitle);
-            panel2.Controls.Add(textBoxImageUrl);
-            panel2.Controls.Add(textBoxGenre);
-            panel2.Controls.Add(textBoxRuntime);
+            panel2.Controls.Add(textBoxMovieTitle);
+            panel2.Controls.Add(textBoxMovieImageUrl);
+            panel2.Controls.Add(textBoxMovieGenre);
+            panel2.Controls.Add(textBoxMovieRuntime);
             panel2.Controls.Add(textBoxMovieDescription);
             panel2.Controls.Add(buttonUpdateMov);
         }
@@ -187,10 +219,10 @@ namespace TestFormApplication
             }
             else if(panel2 != null)
             {
-                textBoxTitle.ReadOnly = false;
-                textBoxImageUrl.ReadOnly = false;
-                textBoxGenre.ReadOnly = false;
-                textBoxRuntime.ReadOnly = false;
+                textBoxMovieTitle.ReadOnly = false;
+                textBoxMovieImageUrl.ReadOnly = false;
+                textBoxMovieGenre.ReadOnly = false;
+                textBoxMovieRuntime.ReadOnly = false;
                 textBoxMovieDescription.ReadOnly = false;
                 buttonUpdateMov.Visible = true;
             }
@@ -207,6 +239,75 @@ namespace TestFormApplication
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             Application.Exit();
+        }
+
+        void onActorButtonClick (object sender , EventArgs e)
+        {
+            actor.name = textBox1.Text;
+            List<Actor> actorList = new List<Actor>();
+            
+            dbHandler.actorInfo(actor, actorList);
+            
+            foreach (Actor a in actorList)
+            {
+                textBoxName.Text = a.name;
+                textBoxProfileImage.Text = a.imageUrl;
+                textBoxDescription.Text = a.biography;
+            }
+
+        }
+
+        void onDirectorButtonClick(object sender, EventArgs e)
+        {
+            director.name = textBox1.Text;
+            List<Director> directorList = new List<Director>();
+           
+            dbHandler.directorInfo(director, directorList);
+           
+            foreach (Director d in directorList)
+            {
+                textBoxName.Text = d.name;
+                textBoxProfileImage.Text = d.imageUrl;
+                textBoxDescription.Text = d.biography;
+            }
+        }
+
+        void onMovieButtonClick(object sender, EventArgs e)
+        {
+            movie.title = textBox1.Text;
+            List<Movie> movieList = new List<Movie>();
+            
+            dbHandler.movieInfo(movie, movieList);
+           
+            foreach (Movie m in movieList)
+            {
+                textBoxMovieTitle.Text = m.title;
+                textBoxMovieImageUrl.Text = m.imageUrl;
+                textBoxMovieGenre.Text = m.genre;
+                textBoxMovieRuntime.Text = Convert.ToString(m.runtime);
+                textBoxMovieDescription.Text = m.description;
+            }
+        }
+
+        void onActorUpdateButtonClick(object sender, EventArgs e)
+        {
+            actor.name = textBoxName.Text;
+            actor.imageUrl = textBoxProfileImage.Text;
+            actor.biography = textBoxDescription.Text;
+            
+            dbHandler.updateActor(actor);
+         
+        }
+
+        void onDirectorUpdateButtonClick(object sender, EventArgs e)
+        {
+
+            director.name = textBoxName.Text;
+            director.imageUrl = textBoxProfileImage.Text;
+            director.biography = textBoxDescription.Text;
+
+            dbHandler.updateDirector(director);
+
         }
 
     }
