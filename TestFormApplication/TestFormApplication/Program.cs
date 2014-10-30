@@ -135,6 +135,7 @@ namespace TestFormApplication
 
         public static void movieInfo(GraphClient client, Movie mov, List<Movie> movList)
         {
+            client.Connect();
             var result =
                 client.Cypher
                 .Match("(m:Movie)")
@@ -214,6 +215,7 @@ namespace TestFormApplication
         //The following methods updates the nodes in neo4j
         public static void updateActor(GraphClient client, Actor acteur)
         {
+            client.Connect();
             client.Cypher
                 .Match("(a:Actor)")
                 .Where((Actor a) => a.name == acteur.name)

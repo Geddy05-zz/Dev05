@@ -113,6 +113,7 @@ namespace TestFormApplication
             {
                 actor = new Actor();
                 searchButton.Click += new EventHandler(onActorButtonClick);
+                buttonUpdateActDir.Click += new EventHandler(onActorUpdateButtonClick);
             }
             else if (selected.Equals("Director"))
             {
@@ -134,6 +135,7 @@ namespace TestFormApplication
         {
             panel2 = new Panel();
             buttonUpdateMov = new Button();
+            movie = new Movie();
             textBoxMovieTitle = new TextBox();
             textBoxMovieImageUrl = new TextBox();
             textBoxMovieGenre = new TextBox();
@@ -179,6 +181,8 @@ namespace TestFormApplication
             buttonUpdateMov.Text = "update node";
             buttonUpdateMov.Size = new Size(88, 23);
             buttonUpdateMov.Visible = false;
+
+            searchButton.Click += new EventHandler(onMovieButtonClick);
 
             // Add the Panel control to the form.
             this.Controls.Add(panel2);
@@ -260,6 +264,34 @@ namespace TestFormApplication
                 textBoxProfileImage.Text = d.imageUrl;
                 textBoxDescription.Text = d.biography;
             }
+        }
+
+        void onMovieButtonClick(object sender, EventArgs e)
+        {
+            var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
+            movie.title = textBox1.Text;
+            List<Movie> movieList = new List<Movie>();
+            Program.movieInfo(client, movie, movieList);
+            foreach (Movie m in movieList)
+            {
+                textBoxMovieTitle.Text = m.title;
+                textBoxMovieImageUrl.Text = m.imageUrl;
+                textBoxMovieGenre.Text = m.genre;
+                textBoxMovieRuntime.Text = Convert.ToString(m.runtime);
+                textBoxMovieDescription.Text = m.description;
+            }
+        }
+
+        void onActorUpdateButtonClick(object sender, EventArgs e)
+        {
+            var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
+
+            actor.name = textBoxName.Text;
+            actor.imageUrl = textBoxProfileImage.Text;
+            actor.biography = textBoxDescription.Text;
+
+            Program.updateActor(client, actor);
+
         }
 
     }
