@@ -32,8 +32,9 @@ namespace TestFormApplication
             //Branch Olson
             //Connect to the graph database
             var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
-            /*
+            
             client.Connect();
+            /*
             //My test actor
             Actor ac = new Actor();
             ac.name = "Keanu Reeves";
@@ -100,6 +101,7 @@ namespace TestFormApplication
 
         public static void actorInfo(GraphClient client, Actor act, List<Actor> actList)
         {
+            client.Connect();
             var result =
                 client.Cypher
                 .Match("(a:Actor)")
@@ -116,6 +118,7 @@ namespace TestFormApplication
 
         public static void directorInfo(GraphClient client, Director dir,List<Director> dirList)
         {
+            client.Connect();
             var result =
                 client.Cypher
                 .Match("(d:Director)")
@@ -153,10 +156,11 @@ namespace TestFormApplication
 
         // CRUD operations for NEO4J
         // This is a generic function that creates all the node necessary for this assignment
-        public static void createNode(GraphClient client, Object newNode, String typeOfNode)
+        public static void createNode(GraphClient client,Object newNode, String typeOfNode)
         {
-            String nodeType;
-            
+            var nodeType = " ";
+
+            client.Connect();
             switch (typeOfNode)
             {
                 case "Actor":
