@@ -46,6 +46,11 @@ namespace TestFormApplication
                     panel2.Dispose();
                     panel2 = null;
                 }
+                else if (panel1 != null)
+                {
+                    panel1.Dispose();
+                    panel1 = null;
+                }
                 CreateActorDirectorPanel();
             }
             else if(selected.Equals("Movie"))
