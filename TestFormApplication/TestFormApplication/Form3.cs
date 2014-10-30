@@ -54,10 +54,7 @@ namespace TestFormApplication
 
         private void button2_Click(object sender, EventArgs e)
         {
-            this.Dispose();
-            Form2 f2 = new Form2();
-            f2.ShowDialog();
-            this.Close();
+            disposeForm();
         }
 
         //example msdn
@@ -180,6 +177,8 @@ namespace TestFormApplication
 
         void Onb2Click(object sender, EventArgs e)
         {
+            string confirmationMessage = "Node has been created successfully";
+
             if (actor != null)
             {
                 actor.name = textBoxName.Text;
@@ -204,6 +203,8 @@ namespace TestFormApplication
                 movie.description = textBoxMovieDescription.Text;
                 dbHandler.createNode(movie, "Movie");
             }
+            MessageBox.Show(confirmationMessage);
+            disposeForm();
 
         }
 
@@ -215,6 +216,14 @@ namespace TestFormApplication
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void disposeForm()
+        {
+            this.Dispose();
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+            this.Close();
         }
 
     }
