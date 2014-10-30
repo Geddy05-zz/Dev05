@@ -29,11 +29,15 @@ namespace TestFormApplication
         TextBox textBoxMovieRuntime;
         TextBox textBoxMovieDescription;
         List<Actor> actorList = new List<Actor>();
+        DataBaseHandler dbHandler;
+         
         
 
         public Form5()
         {
             InitializeComponent();
+            dbHandler = new DataBaseHandler();
+            
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -119,6 +123,7 @@ namespace TestFormApplication
             {
                 director = new Director();
                 searchButton.Click += new EventHandler(onDirectorButtonClick);
+                buttonUpdateActDir.Click += new EventHandler(onDirectorUpdateButtonClick);
             }
                 
 
@@ -238,11 +243,11 @@ namespace TestFormApplication
 
         void onActorButtonClick (object sender , EventArgs e)
         {
-            var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
             actor.name = textBox1.Text;
             List<Actor> actorList = new List<Actor>();
-            Console.WriteLine(actorList.Capacity);
-            Program.actorInfo(client, actor, actorList);
+            
+            dbHandler.actorInfo(actor, actorList);
+            
             foreach (Actor a in actorList)
             {
                 textBoxName.Text = a.name;
@@ -254,10 +259,11 @@ namespace TestFormApplication
 
         void onDirectorButtonClick(object sender, EventArgs e)
         {
-            var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
             director.name = textBox1.Text;
             List<Director> directorList = new List<Director>();
-            Program.directorInfo(client, director, directorList);
+           
+            dbHandler.directorInfo(director, directorList);
+           
             foreach (Director d in directorList)
             {
                 textBoxName.Text = d.name;
@@ -268,10 +274,11 @@ namespace TestFormApplication
 
         void onMovieButtonClick(object sender, EventArgs e)
         {
-            var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
             movie.title = textBox1.Text;
             List<Movie> movieList = new List<Movie>();
-            Program.movieInfo(client, movie, movieList);
+            
+            dbHandler.movieInfo(movie, movieList);
+           
             foreach (Movie m in movieList)
             {
                 textBoxMovieTitle.Text = m.title;
@@ -284,13 +291,22 @@ namespace TestFormApplication
 
         void onActorUpdateButtonClick(object sender, EventArgs e)
         {
-            var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
-
             actor.name = textBoxName.Text;
             actor.imageUrl = textBoxProfileImage.Text;
             actor.biography = textBoxDescription.Text;
+            
+            dbHandler.updateActor(actor);
+         
+        }
 
-            Program.updateActor(client, actor);
+        void onDirectorUpdateButtonClick(object sender, EventArgs e)
+        {
+
+            director.name = textBoxName.Text;
+            director.imageUrl = textBoxProfileImage.Text;
+            director.biography = textBoxDescription.Text;
+
+            dbHandler.updateDirector(director);
 
         }
 

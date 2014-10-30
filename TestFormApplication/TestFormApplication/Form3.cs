@@ -26,9 +26,11 @@ namespace TestFormApplication
         Actor actor;
         Director director;
         Movie movie;
+        DataBaseHandler dbHandler;
         public Form3()
         {
             InitializeComponent();
+            dbHandler = new DataBaseHandler();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -178,13 +180,12 @@ namespace TestFormApplication
 
         void Onb2Click(object sender, EventArgs e)
         {
-            var client = new GraphClient(new Uri("http://localhost:7474/db/data"));
             if (actor != null)
             {
                 actor.name = textBoxName.Text;
                 actor.imageUrl = textBoxProfileImg.Text;
                 actor.biography = textBoxDescription.Text;
-                Program.createNode(client,actor, "Actor");
+                dbHandler.createNode(actor, "Actor");
 
             }
             else if (director != null)
@@ -192,7 +193,7 @@ namespace TestFormApplication
                 director.name = textBoxName.Text;
                 director.imageUrl = textBoxProfileImg.Text;
                 director.biography = textBoxDescription.Text;
-                Program.createNode(client, director, "Director");
+                dbHandler.createNode(director, "Director");
             }
             else if (movie != null)
             {
@@ -201,7 +202,7 @@ namespace TestFormApplication
                 movie.genre = textBoxMovieGenre.Text;
                 movie.runtime = Convert.ToInt32(textBoxMovieRunTime.Text);
                 movie.description = textBoxMovieDescription.Text;
-                Program.createNode(client, movie, "Movie");
+                dbHandler.createNode(movie, "Movie");
             }
 
         }
