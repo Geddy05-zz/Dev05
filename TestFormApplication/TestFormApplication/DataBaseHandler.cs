@@ -262,6 +262,27 @@ namespace TestFormApplication
 
         }
 
+        public void createActorRelationship(Actor acteur, Movie mov)
+        {
+            initClientConnection();
+            this.client.Cypher
+                .Match("(a:Actor)", "(m:Movie)")
+                .Where((Actor a) => a.name == acteur.name)
+                .AndWhere((Movie m) => m.title == mov.title)
+                .CreateUnique("a-[:ACTS_IN]-(m)")
+                .ExecuteWithoutResults();
+        }
+
+        public void createDirectorRelationship(Director director, Movie mov)
+        {
+            initClientConnection();
+            this.client.Cypher
+                .Match("(d:Director)", "(m:Movie)")
+                .Where((Director d) => d.name == director.name)
+                .AndWhere((Movie m) => m.title == mov.title)
+                .CreateUnique("d-[:DIRECTED]-(m)")
+                .ExecuteWithoutResults();
+        }
     }
 
 }
