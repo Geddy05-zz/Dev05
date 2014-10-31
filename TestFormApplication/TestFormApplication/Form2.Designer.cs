@@ -32,6 +32,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
+            this.createRButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button1
@@ -66,7 +67,7 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(88, 205);
+            this.button5.Location = new System.Drawing.Point(88, 257);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(102, 28);
             this.button5.TabIndex = 4;
@@ -74,11 +75,22 @@
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
+            // createRButton
+            // 
+            this.createRButton.Location = new System.Drawing.Point(88, 201);
+            this.createRButton.Name = "createRButton";
+            this.createRButton.Size = new System.Drawing.Size(102, 37);
+            this.createRButton.TabIndex = 5;
+            this.createRButton.Text = "Create Relationship";
+            this.createRButton.UseVisualStyleBackColor = true;
+            this.createRButton.Click += new System.EventHandler(this.createRButton_Click);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 278);
+            this.ClientSize = new System.Drawing.Size(284, 310);
+            this.Controls.Add(this.createRButton);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.button2);
@@ -95,5 +107,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button createRButton;
     }
 }

@@ -58,5 +58,13 @@ namespace TestFormApplication
         {
             Application.Exit();
         }
+
+        private void createRButton_Click(object sender, EventArgs e)
+        {
+            this.Dispose();
+            this.Close();
+            Form6 f6 = new Form6();
+            f6.ShowDialog();
+        }
     }
 }
