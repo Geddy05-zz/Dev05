@@ -25,6 +25,7 @@ namespace TestFormApplication
 
         private void Button5_Click(object sender, EventArgs e)
         {
+            textBoxInput.Text = " ";
             //Actors who played more than two films together
             actor = new Actor();
             actor.name = textBoxInput.Text;
@@ -123,7 +124,8 @@ namespace TestFormApplication
 
         private void button3_Click_1(object sender, EventArgs e)
         {
-            //Most
+            //Most recent movies by genre
+
         }
 
         private void input_TextChanged(object sender, EventArgs e)
