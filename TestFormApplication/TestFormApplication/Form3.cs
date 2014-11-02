@@ -13,7 +13,6 @@ namespace TestFormApplication
 {
     public partial class Form3 : Form
     {
-        TextBox textBox1;
         TextBox textBoxName;
         TextBox textBoxProfileImg;
         TextBox textBoxDescription;

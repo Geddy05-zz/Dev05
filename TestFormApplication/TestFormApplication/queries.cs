@@ -23,90 +23,35 @@ namespace TestFormApplication
             dbHandler = new DataBaseHandler();
         }
 
-        //Most recent movies 
-        private void Button1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        //actorWhoDirectedOwnMovie
-        private void Button2_Click(object sender, EventArgs e)
-        {
-            List<Actor> listActor = new List<Actor>();
-            List<long> listCount = new List<long>();
-            dbHandler.actorWhoDirectedOwnMovie(listActor, listCount);
-
-            if (listActor.Any() && listCount.Any())
-            {
-                List<String> actorNames = listActor.Select(C => C.name).ToList();
-                //List<String> counts = listCount.Select(C => C.name).ToList();
-                textBox2.Text = listActor.First().name;
-            }
-            else
-            {
-                textBox2.Text = "There are no Directors whom acted in their own movies";
-            }
-        }
-
-        //mostRecentMovies
-        private void Button3_Click(object sender, EventArgs e)
-        {
-            List<Movie> movies = new List<Movie>();
-            dbHandler.mostRecentMovies(movies);
-
-            if (movies.Any())
-            {
-                List<String> titles = movies.Select(C => C.title).ToList();
-                textBox2.Text = titles.ToString();
-            }
-            else
-            {
-                textBox2.Text = "There are no movies!?";
-            }
-        }
-
-        //mostRecentMoviesByGenre
-        private void Button4_Click(object sender, EventArgs e)
-        {
-            Movie movie = new Movie();
-            List<Movie> movies = new List<Movie>();
-            dbHandler.mostRecentMoviesByGenre(movie, movies);
-
-            if (movies.Any())
-            {
-                List<String> titles = movies.Select(C => C.title).ToList();
-                textBox2.Text = titles.ToString();
-            }
-            else
-            {
-                textBox2.Text = "There are no movies!?";
-            }
-        }
-
-        //actorsWhoPlayedMoreThanTwoFilms
         private void Button5_Click(object sender, EventArgs e)
         {
-            Actor ac = new Actor();
-            ac.name = this.textBox1.Text;
-            List<Actor> listActor1 = new List<Actor>();
-            List<Actor> listActor2 = new List<Actor>();
-            dbHandler.actorsWhoPlayedMoreThanTwoFilms(ac, listActor1, listActor2);
-            if (listActor1.Any() && listActor2.Any())
-            {
-                List<String> actorNames1 = listActor1.Select(C => C.name).ToList();
-                List<String> actorNames2 = listActor2.Select(C => C.name).ToList();
+            textBoxInput.Text = " ";
+            //Actors who played more than two films together
+            actor = new Actor();
+            actor.name = textBoxInput.Text;
 
-                textBox2.Text = ac.name + " played in more than two films with: /n" + actorNames1 + actorNames2;
-            }
-            else
+            //List to hold the result
+            List<Actor> listActor1 = new List<Actor>();
+            List<Actor> listActorResult = new List<Actor>();
+            
+
+            dbHandler.actorsWhoPlayedMoreThanTwoFilms(actor, listActor1,listActorResult);
+            
+            //Prints result
+            foreach( Actor a in listActorResult)
             {
-                textBox2.Text = ac.name + " hasn't played more than once with other actors";
+                textBoxOutput.Text += a.name + Environment.NewLine;
             }
         }
 
-        private void Button6_Click(object sender, EventArgs e)
+        private void Button3_Click(object sender, EventArgs e)
         {
-            disposeForm();
+
+        }
+
+        private void Button4_Click(object sender, EventArgs e)
+        {
+
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -121,5 +66,82 @@ namespace TestFormApplication
             f2.ShowDialog();
             this.Close();
         }
+
+        private void Back_Click(object sender, EventArgs e)
+        {
+            disposeForm();
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            //Actor who directed own film
+            List<Actor> listActorResult = new List<Actor>();
+            List<long> listCountResultActor = new List<long>();
+
+            dbHandler.actorWhoDirectedOwnMovie(listActorResult, listCountResultActor);
+            textBoxOutput.Text = " ";
+
+            int index = 0;
+            foreach (Actor a in listActorResult)
+            {
+                textBoxOutput.Text += " " + a.name + "   Movie count : " + listCountResultActor[index] + Environment.NewLine;
+                index++;
+            }
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            //Most Recent Movie 
+            List<Movie> listMovieResult = new List<Movie>();
+            dbHandler.mostRecentMovies(listMovieResult);
+            textBoxOutput.Text = " ";
+
+            foreach (Movie m in listMovieResult)
+            {
+                textBoxOutput.Text += m.title + "  " + m.longToDate() + Environment.NewLine;
+            }
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            //Most recent movie by genre
+            List<Movie> listMovieResult = new List<Movie>();
+            textBoxOutput.Text = " ";
+            Movie mov = new Movie();
+            mov.genre = textBoxInputGenre.Text;
+
+            dbHandler.mostRecentMoviesByGenre(mov, listMovieResult);
+
+            foreach (Movie m in listMovieResult)
+            {
+                textBoxOutput.Text += m.title + "  " + m.longToDate() + Environment.NewLine;
+            }
+
+
+
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            //Most recent movies by genre
+
+        }
+
+        private void input_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void queries_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBoxInput_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
     }
 }
