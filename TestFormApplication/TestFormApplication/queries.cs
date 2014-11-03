@@ -25,7 +25,7 @@ namespace TestFormApplication
 
         private void Button5_Click(object sender, EventArgs e)
         {
-            textBoxInput.Text = " ";
+            
             //Actors who played more than two films together
             actor = new Actor();
             actor.name = textBoxInput.Text;
@@ -33,8 +33,8 @@ namespace TestFormApplication
             //List to hold the result
             List<Actor> listActor1 = new List<Actor>();
             List<Actor> listActorResult = new List<Actor>();
-            
 
+            MessageBox.Show(actor.name);
             dbHandler.actorsWhoPlayedMoreThanTwoFilms(actor, listActor1,listActorResult);
             
             //Prints result
@@ -42,6 +42,9 @@ namespace TestFormApplication
             {
                 textBoxOutput.Text += a.name + Environment.NewLine;
             }
+
+            MessageBox.Show(Convert.ToString(listActorResult.Count()));
+            textBoxInput.Text = " ";
         }
 
         private void Button3_Click(object sender, EventArgs e)
@@ -62,8 +65,8 @@ namespace TestFormApplication
         private void disposeForm()
         {
             this.Dispose();
-            Form2 f2 = new Form2();
-            f2.ShowDialog();
+            Form1 f1 = new Form1();
+            f1.ShowDialog();
             this.Close();
         }
 
