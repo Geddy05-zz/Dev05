@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace TestFormApplication
 {
@@ -13,13 +14,24 @@ namespace TestFormApplication
 
         private void initClientConnection()
         {
-            if(this.client != null)
+            try
             {
-                return;
+                if (this.client != null)
+                {
+                    return;
+                }
+
+                this.client = new GraphClient(new Uri("http://localhost:7474/db/data"));
+                this.client.Connect();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Could not make connection to database, check if database server is on and try again.");
+                Application.Restart();
+                
             }
 
-            this.client = new GraphClient(new Uri("http://localhost:7474/db/data"));
-            this.client.Connect();
+
         }
 
         /*

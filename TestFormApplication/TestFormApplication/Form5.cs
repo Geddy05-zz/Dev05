@@ -230,10 +230,7 @@ namespace TestFormApplication
 
         private void Form5_Load(object sender, EventArgs e)
         {
-            if (string.Equals((sender as Button).Name, @"CloseButton"))
-            {
-                Application.Exit();
-            }
+
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
